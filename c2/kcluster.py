@@ -1,6 +1,8 @@
 import distances
 import random
 from sklearn.datasets import load_iris
+from PIL import Image, ImageDraw
+from math import sqrt
 
 def read_file(filename):
   with open(filename) as f:
@@ -43,17 +45,58 @@ def kcluster(rows, distance = distances.euclidean, k = 4):
         clusters[i] = avgs
   return best_matches
 
+def adjust(data, distance = distances.euclidean_inverse, rate = 0.01):
+  n = len(data)
+  realdist = [[distance(data[i], data[j]) for j in range(n)] for i in range(n)]
+  fakedist = [[0.0 for j in range(n)] for i in range(n)]
+  loc = [[random.random(), random.random()] for i in range(n)]
+  lasterror = None
+  for t in range(1000):
+    for i in range(n):
+      for j in range(n):
+        fakedist[i][j] = sqrt(sum([pow(loc[i][x] - loc[j][x], 2) for x in range(len(loc[i]))]))
+  
+    grad = [[0.0, 0.0] for i in range(n)]
+    totalerror = 0
+    for i in range(n):
+      for j in range(n):
+        if i == j:
+          continue
+        errorterm = (fakedist[j][i] - realdist[j][i]) / realdist[j][i]
+        grad[i][0] = errorterm * (loc[j][0] - loc[i][0]) / fakedist[i][j] 
+        grad[i][1] = errorterm * (loc[j][1] - loc[i][1]) / fakedist[i][j]
+        totalerror += errorterm
+    if lasterror and lasterror < totalerror:
+      break
+    lasterror = totalerror
+    for i in range(n):
+      loc[i][0] -= grad[i][0] * rate
+      loc[i][1] -= grad[i][1] * rate
+
+  return loc
+
+def draw2d(data, labels, jpeg='cluster.jpg'):
+  img = Image.new('RGB', (2000, 2000), (255, 255, 255))
+  draw = ImageDraw.Draw(img)
+  for i in range(len(data)):
+    x = (data[i][0] + 0.5) * 1000
+    y = (data[i][1] + 0.5) * 1000
+    draw.text((x, y), labels[i], (0, 0, 0))
+  img.save(jpeg, 'JPEG')
+
 def main():
-  # colnames, rownames, data = read_file('blogdata.txt')
+  colnames, rownames, data = read_file('blogdata.txt')
+  print(len(colnames))
   # clusters = kcluster(data, k = 3)
   # print(clusters)
-
-  iris = load_iris()
-  data = iris.data
-  print(iris)
-  clusters = kcluster(data, k = 4)
-  for cluster in clusters:
-    print(cluster)
+  coords = adjust(data)
+  draw2d(coords, rownames)
+  # iris = load_iris()
+  # data = iris.data
+  # print(iris)
+  # clusters = kcluster(data, k = 4)
+  # for cluster in clusters:
+  #   print(cluster)
 
 if __name__ == '__main__':
   main()
