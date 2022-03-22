@@ -1,6 +1,7 @@
 from sample import sample
 from math import log
 from PIL import Image, ImageDraw
+import util
 
 class DecisionNode:
   def __init__(self, col = -1, value = None, results = None, falseSubtree = None, trueSubtree = None):
@@ -132,12 +133,14 @@ def drawNode(draw, node, x, y):
 
 # https://archive.ics.uci.edu/ml/machine-learning-databases/car/
 def main():
-  data = sample
-  tree = buildTree(sample)
-  testSample = ['digg', 'USA', 'yes', 19]
+  # data = sample
+  data = util.loadCarData()
+  # tree = buildTree(sample)
+  tree = buildTree(data)
+  # testSample = ['digg', 'USA', 'yes', 19]
   # result = classify(testSample, tree)
   # print(result)
-  # printTree(tree)
+  printTree(tree)
   drawTree(tree)
 
 if __name__  == '__main__':
