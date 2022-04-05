@@ -61,3 +61,26 @@ negative_sampling_candidates, _, _ = tf.random.log_uniform_candidate_sampler(
 # print(negative_sampling_candidates)
 
 # print([inverse_vocab[index.numpy()] for index in negative_sampling_candidates])
+
+negative_sampling_candidates = tf.expand_dims(negative_sampling_candidates, 1)
+context = tf.concat([context_class, negative_sampling_candidates], 0)
+
+label = tf.constant([1] + [0] * num_ns, dtype="int64")
+
+target = tf.squeeze(target_word)
+context = tf.squeeze(context)
+label = tf.squeeze(label)
+
+# print(target)
+# vocab_item = inverse_vocab[target.ref()]
+
+# print(f"target {target} {inverse_vocab[target_word]}")
+# print(context)
+# print(label)
+
+path_to_file = tf.keras.utils.get_file('shakespeare.txt', 'https://storage.googleapis.com/download.tensorflow.org/data/shakespeare.txt')
+
+with open(path_to_file) as f :
+  lines = f.read().splitlines()
+
+print(lines[:10])
