@@ -1,7 +1,10 @@
 import gensim.models
 from gensim import utils
 import pprint
+from gensim.test.utils import common_texts
+from gensim.test.utils import datapath
 
+print(common_texts)
 sentences = [
     "Human machine interface for lab abc computer applications",
     "A survey of user opinion of computer system response time",
@@ -14,8 +17,25 @@ sentences = [
     "Graph minors A survey",
 ]
 
-sentences = map(lambda x: utils.simple_preprocess(x), sentences)
+class Corpus:
+    def __iter__(self):
+        corpus_path = datapath('lee_background.cor')
+        for line in open(corpus_path):
+            result = utils.simple_preprocess(line)
+            print(result)
+            yield result
+
+# sentences = common_texts
+# sentences = list(map(lambda x: utils.simple_preprocess(x), sentences))
+
+sentences = Corpus()
+
+# print(sentences)
 
 model = gensim.models.Word2Vec(sentences=sentences)
 
-pprint.pprint(model.wv['of'])
+# pprint.pprint(len(model.wv))
+wv = model.wv
+print(wv['paris'] - wv['france'] + wv['afghanistan'])
+print(wv['kabul'])
+
