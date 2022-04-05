@@ -24,7 +24,7 @@ vocabulary_size = len(vocab)
 
 example_sequence = [vocab[word] for word in tokens]
 
-print(example_sequence)
+# print(example_sequence)
 
 window_size = 2
 positive_skip_grams, _ = tf.keras.preprocessing.sequence.skipgrams(
@@ -34,8 +34,30 @@ positive_skip_grams, _ = tf.keras.preprocessing.sequence.skipgrams(
   negative_samples = 0
 )
 
-print(len(positive_skip_grams))
-print(positive_skip_grams[:5])
+# print(len(positive_skip_grams))
+# print(positive_skip_grams[:5])
 
-for target, context in positive_skip_grams[:5]:
-  print(f"({target}, {context}): ({inverse_vocab[target]}, {inverse_vocab[context]})")
+# for target, context in positive_skip_grams[:5]:
+#   print(f"({target}, {context}): ({inverse_vocab[target]}, {inverse_vocab[context]})")
+
+
+target_word, context_word = positive_skip_grams[0]
+
+context_class = tf.reshape(tf.constant(context_word, dtype="int64"), (1, 1))
+
+num_ns = 4
+
+
+negative_sampling_candidates, _, _ = tf.random.log_uniform_candidate_sampler(
+  true_classes = context_class,
+  num_true = 1,
+  num_sampled = num_ns,
+  unique = True,
+  range_max = vocabulary_size,
+  name = "negative sampling",
+  seed = 13
+)
+
+# print(negative_sampling_candidates)
+
+# print([inverse_vocab[index.numpy()] for index in negative_sampling_candidates])
