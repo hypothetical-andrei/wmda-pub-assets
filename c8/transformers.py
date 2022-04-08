@@ -45,7 +45,7 @@ class TokenAndPositionEmbedding(layers.Layer):
     return token_embeddings + position_embeddings
 
 class NERModel(keras.Model):
-  def __init__(self, num_tags, vocab_size, maxlen=128, em_dib=32,num_heads=2, ff_dim=32):
+  def __init__(self, num_tags, vocab_size, maxlen=128, embed_dib=32,num_heads=2, ff_dim=32):
     super(NERModel, self).__init__()
     self.embedding_layer = TokenAndPositionEmbedding(maxlen, vocab_size, embed_dim)
     self.transformer_block = TransformerBlock(embed_dim, num_heads, ff_dim)
