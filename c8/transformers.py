@@ -38,14 +38,14 @@ class TokenAndPositionEmbedding(layers.Layer):
     self.token_emb = keras.layers.Embedding(input_dim=vocab_size, output_dim=embed_dim)
     self.pos_emb = keras.layers.Embedding(input_dim=maxlen, output_dim=embed_dim)
   def call(self, inputs):
-    maxlen = td.shape(inputs)[-1]
+    maxlen = tf.shape(inputs)[-1]
     positions = tf.range(start=0, limit=maxlen, delta=1)
     position_embeddings = self.pos_emb(positions)
     token_embeddings = self.token_emb(inputs)
     return token_embeddings + position_embeddings
 
 class NERModel(keras.Model):
-  def __init__(self, num_tags, vocab_size, maxlen=128, embed_dib=32,num_heads=2, ff_dim=32):
+  def __init__(self, num_tags, vocab_size, maxlen=128, embed_dim=32,num_heads=2, ff_dim=32):
     super(NERModel, self).__init__()
     self.embedding_layer = TokenAndPositionEmbedding(maxlen, vocab_size, embed_dim)
     self.transformer_block = TransformerBlock(embed_dim, num_heads, ff_dim)
