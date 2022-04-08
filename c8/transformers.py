@@ -127,6 +127,10 @@ def lowercase_and_convert_to_ids(tokens):
     tokens = tf.strings.lower(tokens)
     return lookup_layer(tokens)
 
+def tokenize_and_convert_to_ids(text):
+    tokens = text.split()
+    return lowercase_and_convert_to_ids(tokens)
+
 batch_size = 32
 train_dataset = (
     train_data.map(map_record_to_training_data)
@@ -168,3 +172,32 @@ print(sample_input)
 output = ner_model.predict(sample_input)
 prediction = np.argmax(output, axis=-1)[0]
 prediction = [mapping[i] for i in prediction]
+
+
+def calculate_metrics(dataset):
+    all_true_tag_ids, all_predicted_tag_ids = [], []
+
+    for x, y in dataset:
+        output = ner_model.predict(x)
+        predictions = np.argmax(output, axis=-1)
+        predictions = np.reshape(predictions, [-1])
+
+        true_tag_ids = np.reshape(y, [-1])
+
+        mask = (true_tag_ids > 0) & (predictions > 0)
+        true_tag_ids = true_tag_ids[mask]
+        predicted_tag_ids = predictions[mask]
+
+        all_true_tag_ids.append(true_tag_ids)
+        all_predicted_tag_ids.append(predicted_tag_ids)
+
+    all_true_tag_ids = np.concatenate(all_true_tag_ids)
+    all_predicted_tag_ids = np.concatenate(all_predicted_tag_ids)
+
+    predicted_tags = [mapping[tag] for tag in all_predicted_tag_ids]
+    real_tags = [mapping[tag] for tag in all_true_tag_ids]
+
+    evaluate(real_tags, predicted_tags)
+
+
+calculate_metrics(val_dataset)
