@@ -3,6 +3,7 @@ from tensorflow.keras import layers
 import re
 import string
 import tqdm
+import numpy as np
 
 sentence = "this is a sentence and it is a good sentence"
 
@@ -176,6 +177,11 @@ targets, contexts, labels = generate_training_data(
   seed = 13
 )
 
+# PATCH
+targets = np.array(targets)
+contexts = np.array(contexts)[:,:,0]
+labels = np.array(labels)
+# END PATCH
 
 BUFFER_SIZE = 10000
 
